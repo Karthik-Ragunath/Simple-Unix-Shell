@@ -17,55 +17,59 @@ int main()
 			printf("breaking out");
 			exit(EXIT_SUCCESS);
 		}
-		printf("The input is %s\n", line);
-		printf("The retrieved length is %d\n", read);
 		char* delimiter_token = " ";
-		char* token = strtok(line, delimiter_token);
-		int i;
-		for(i = 0; token != NULL; i++)
+		char* command_token = strtok(line, delimiter_token);
+
+		int argument_index = 0;
+		int arguments_size = 200;
+		char** arguments = (char **)malloc(arguments_size * sizeof(char *));
+		for(argument_index = 0; argument_index < arguments_size; argument_index++)
 		{
-			if(i == 0)
+			arguments[argument_index] = (char *)malloc(100 * sizeof(char));
+		}
+		for(argument_index = 0; command_token != NULL; argument_index++)
+		{
+			arguments[argument_index] = command_token;
+			command_token = strtok(NULL, delimiter_token);
+			if(argument_index == arguments_size - 1)
 			{
-				printf("The command given is %s\n", token);
+				arguments_size += 100; 
+				arguments = (char **)realloc(arguments, arguments_size * sizeof(char *));
+				int resized_arg_index;
+				for(resized_arg_index = argument_index + 1; resized_arg_index < arguments_size; resized_arg_index++)
+				{
+					arguments[resized_arg_index] = (char *)malloc(sizeof(char) * 100);
+				}
+			}
+		}
+		
+		arguments[argument_index] = NULL;
+
+		command_token = strtok(line, delimiter_token);
+
+		if(argument_index == 1)
+		{
+			command_token[strlen(command_token) - 1] = '\0';
+		}
+		char *filepath = (char *)malloc(100 * sizeof(char));
+		char *dirpath = "/bin/";
+		strcpy(filepath, dirpath);
+		strcat(filepath, command_token);
+
+		int is_command_executable = access(filepath, X_OK);
+		if(is_command_executable == 0)
+		{
+			int rc = fork();
+			if(rc == 0)
+			{
+				execv(filepath, arguments);
 			}
 			else
 			{
-				printf("The argument %d is %s\n", i, token); 
+				wait(NULL);
 			}
-			token = strtok(NULL, delimiter_token);
 		}
-
-		int is_executable = access("/bin/ls", X_OK);
-		if(is_executable == 0)
-		{
-			printf("Yes, it is executable\n");
-		}
-		else if(is_executable == -1)
-		{
-			printf("No, the specified file path is not a executable\n");
-		}
-
-		char* command_token = strtok(line, delimiter_token);
-		int is_command_executable = access(command_token, X_OK);
-		if(is_command_executable == 0)
-		{
-			char* arguments;
-			int argument_size = 100;
-			arguments = (char *)malloc(argument_size);
-			int argument_index;
-			for(argument_index = 0; command_token != NULL; argument_index++)
-			{
-				command_token = strtok(NULL, delimiter_token);
-				arguments[i] = command_token;
-				if(argument_index == argument_size - 2)
-				{
-					argument_size += 100;
-					arguments = (char*)realloc(argument_size);
-				}					
-			}
-			arguments[argument_index + 1] = NULL;
-			execv(
-		}
+		 
 	}
 	free(line);
 	exit(EXIT_SUCCESS);
