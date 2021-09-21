@@ -23,6 +23,7 @@ int main()
 		char* command_token = strtok(line, delimiter_token);
 
 		int is_redirection_op_present = 0;
+		int is_change_dr_op_present = 0;
 		int argument_index = 0;
 		int arguments_size = 200;
 		char** arguments = (char **)malloc(arguments_size * sizeof(char *));
@@ -32,8 +33,28 @@ int main()
 		}
 		int prev_arg_redir = 0;
 		char *redir_file = (char *)malloc(100 * sizeof(char));
+		char *dir_path = (char *)malloc(250 * sizeof(char));
+		int incorrect_cd_cmd = 0;
 		for(argument_index = 0; command_token != NULL; argument_index++)
 		{
+			if(argument_index == 0 && strcmp(command_token, "cd") == 0)
+			{
+				is_change_directory_op_present = 1;
+				command_token = strtok(NULL, delimiter_token);
+				continue;
+			}
+			
+			if(is_change_directory_op_present == 1)
+			{
+				strcpy(dir_path, commmand_token);
+				command_token = strtok(NULL, delimiter_token);
+				if(command_token != NULL)
+				{
+					incorrect_cd_cmd = 1;
+					break;
+				}
+			}
+
 			if(strcmp(command_token,">") == 0)
 			{
 				is_redirection_op_present = 1;
@@ -62,6 +83,28 @@ int main()
 			}
 		}
 		
+		if(is_change_directory_op_present == 1) 
+		{
+			if(incorrect_cd_cmd == 1)
+			{
+				printf("Incorrect cd command\n");
+				continue;
+			}
+			else
+			{
+				int dir_change = chdir(dir_path);
+				if(dir_change == -1)
+				{
+					printf("Error occured when changing directory\n");
+				}
+				else if(dir_change == 0)
+				{
+					printf("dir change is successful. current directory is %s\n", dir_path);
+				}
+				continue;
+			}
+		}
+
 		if(is_redirection_op_present == 1)
 		{
 			argument_index = argument_index - 2;
