@@ -1,0 +1,7 @@
+output
+output.txt
+redirection
+redirection.c
+tash
+tash.c
+tash.o

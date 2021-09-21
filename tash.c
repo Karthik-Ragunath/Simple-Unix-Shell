@@ -3,6 +3,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<unistd.h>
+#include<fcntl.h>
 
 int main()
 {
@@ -17,9 +18,12 @@ int main()
 			printf("breaking out");
 			exit(EXIT_SUCCESS);
 		}
+
+
 		char* delimiter_token = " ";
 		char* command_token = strtok(line, delimiter_token);
 
+		int is_redirection_op_present = 0;
 		int argument_index = 0;
 		int arguments_size = 200;
 		char** arguments = (char **)malloc(arguments_size * sizeof(char *));
@@ -27,8 +31,24 @@ int main()
 		{
 			arguments[argument_index] = (char *)malloc(100 * sizeof(char));
 		}
+		int prev_arg_redir = 0;
+		char *redir_file = (char *)malloc(100 * sizeof(char));
 		for(argument_index = 0; command_token != NULL; argument_index++)
 		{
+			if(strcmp(command_token,">") == 0)
+			{
+				is_redirection_op_present = 1;
+				prev_arg_redir = 1;
+				command_token = strtok(NULL, delimiter_token);
+				continue;
+			}
+			if(prev_arg_redir == 1)
+			{
+				strcpy(redir_file, command_token);
+				prev_arg_redir = 0;
+				command_token = strtok(NULL, delimiter_token);
+				continue;
+			}	
 			arguments[argument_index] = command_token;
 			command_token = strtok(NULL, delimiter_token);
 			if(argument_index == arguments_size - 1)
@@ -43,6 +63,13 @@ int main()
 			}
 		}
 		
+		if(is_redirection_op_present == 1)
+		{
+			close(STDOUT_FILENO);
+			open(redir_file, O_CREAT|O_RDWR|O_TRUNC);
+			argument_index = argument_index - 2;
+		}
+
 		arguments[argument_index] = NULL;
 
 		command_token = strtok(line, delimiter_token);
