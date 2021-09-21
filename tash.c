@@ -7,15 +7,14 @@
 
 int main()
 {
-	printf("This is a sample execution\n");
 	char* line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	printf("tash> ");
 	while((read = getline(&line, &len, stdin)) != -1)
 	{
 		if(strcmp(line, "exit\n") == 0)
 		{
-			printf("breaking out");
 			exit(EXIT_SUCCESS);
 		}
 
@@ -65,8 +64,6 @@ int main()
 		
 		if(is_redirection_op_present == 1)
 		{
-			close(STDOUT_FILENO);
-			open(redir_file, O_CREAT|O_RDWR|O_TRUNC);
 			argument_index = argument_index - 2;
 		}
 
@@ -74,7 +71,7 @@ int main()
 
 		command_token = strtok(line, delimiter_token);
 
-		if(argument_index == 1)
+		if(argument_index == 1 && is_redirection_op_present != 1)
 		{
 			command_token[strlen(command_token) - 1] = '\0';
 		}
@@ -88,7 +85,15 @@ int main()
 		{
 			int rc = fork();
 			if(rc == 0)
-			{
+			{					
+				if(is_redirection_op_present == 1)
+				{
+					redir_file[strlen(redir_file) - 1] = '\0';
+					int fd = open(redir_file, O_CREAT | O_WRONLY | O_TRUNC, 00777);
+					dup2(fd, STDOUT_FILENO); // make stdout go to file
+					dup2(fd, STDERR_FILENO); // make stderr to go to file too
+					close(fd);
+				}	
 				execv(filepath, arguments);
 			}
 			else
@@ -96,6 +101,11 @@ int main()
 				wait(NULL);
 			}
 		}
+		else
+		{
+			printf("The given command is not executable\n");
+		}
+		printf("tash> ");
 		 
 	}
 	free(line);
