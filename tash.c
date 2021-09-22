@@ -23,7 +23,7 @@ int main()
 		char* command_token = strtok(line, delimiter_token);
 
 		int is_redirection_op_present = 0;
-		int is_change_dr_op_present = 0;
+		int is_change_directory_op_present = 0;
 		int argument_index = 0;
 		int arguments_size = 200;
 		char** arguments = (char **)malloc(arguments_size * sizeof(char *));
@@ -46,13 +46,13 @@ int main()
 			
 			if(is_change_directory_op_present == 1)
 			{
-				strcpy(dir_path, commmand_token);
+				strcpy(dir_path, command_token);
 				command_token = strtok(NULL, delimiter_token);
 				if(command_token != NULL)
 				{
 					incorrect_cd_cmd = 1;
-					break;
 				}
+				break;
 			}
 
 			if(strcmp(command_token,">") == 0)
@@ -88,21 +88,25 @@ int main()
 			if(incorrect_cd_cmd == 1)
 			{
 				printf("Incorrect cd command\n");
-				continue;
 			}
 			else
 			{
+				dir_path[strlen(dir_path) - 1] = '\0';
+				printf("dir path len: %d\n", strlen(dir_path));
+				printf("The dir path is %s\n", dir_path);
 				int dir_change = chdir(dir_path);
 				if(dir_change == -1)
 				{
-					printf("Error occured when changing directory\n");
+					perror("Error: ");
 				}
 				else if(dir_change == 0)
 				{
 					printf("dir change is successful. current directory is %s\n", dir_path);
 				}
-				continue;
 			}
+
+			printf("tash> ");
+			continue;
 		}
 
 		if(is_redirection_op_present == 1)
