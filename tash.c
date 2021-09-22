@@ -10,6 +10,14 @@ int main()
 	char* line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	char** paths;
+	int number_of_paths = 100;
+	paths = (char **)malloc(100 * sizeof(char *));
+	int path_index;
+	for(path_index = 0; path_index < 100; path_index++)
+	{
+		paths[i] = (char *)malloc(100 * sizeof(char));
+	}
 	printf("tash> ");
 	while((read = getline(&line, &len, stdin)) != -1)
 	{
@@ -32,6 +40,7 @@ int main()
 			arguments[argument_index] = (char *)malloc(100 * sizeof(char));
 		}
 		int prev_arg_redir = 0;
+		int is_path_op_present = 0;
 		char *redir_file = (char *)malloc(100 * sizeof(char));
 		char *dir_path = (char *)malloc(250 * sizeof(char));
 		int incorrect_cd_cmd = 0;
@@ -51,6 +60,19 @@ int main()
 				if(command_token != NULL)
 				{
 					incorrect_cd_cmd = 1;
+				}
+				break;
+			}
+
+			if(strcmp(command_token, "path") == 0 || strcmp(command_token, "path\n") == 0)
+			{
+				is_path_op_present =  1;
+				command_token = strtok(NULL, delimiter_token);
+				int path_index = 0;
+				for(; command_token != NULL; path_index++)
+				{
+					paths[path_index] = command_token;
+					command_token = strtok(NULL, delimiter_token);
 				}
 				break;
 			}
@@ -81,6 +103,13 @@ int main()
 					arguments[resized_arg_index] = (char *)malloc(sizeof(char) * 100);
 				}
 			}
+		}
+
+		if(path_op_present == 1)
+		{
+			printf("Paths set successfully\n");
+			printf("tash> ");
+			continue;
 		}
 		
 		if(is_change_directory_op_present == 1) 
