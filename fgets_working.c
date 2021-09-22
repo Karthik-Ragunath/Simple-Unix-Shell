@@ -24,6 +24,16 @@ int main()
 	while((read_getline = getline(&line, &len_getline, stdin)) != -1)
 	{
 		printf("The string len is %d\n", strlen(line));
+		char* delimiter_token = " ";
+		char* token = strtok(line, delimiter_token);
+		if(strcmp(token, "path\n") == 0)
+		{
+			printf("just checking the working of strtok, works as expected\n");
+		}
+		else
+		{
+			printf("lol, its not as expected\n");
+		}
 		break;
 	}
 	return 0;

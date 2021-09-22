@@ -16,7 +16,7 @@ int main()
 	int path_index;
 	for(path_index = 0; path_index < 100; path_index++)
 	{
-		paths[i] = (char *)malloc(100 * sizeof(char));
+		paths[path_index] = (char *)malloc(100 * sizeof(char));
 	}
 	printf("tash> ");
 	while((read = getline(&line, &len, stdin)) != -1)
@@ -74,6 +74,7 @@ int main()
 					paths[path_index] = command_token;
 					command_token = strtok(NULL, delimiter_token);
 				}
+				paths[path_index] = NULL;
 				break;
 			}
 
@@ -105,9 +106,15 @@ int main()
 			}
 		}
 
-		if(path_op_present == 1)
+		if(is_path_op_present == 1)
 		{
-			printf("Paths set successfully\n");
+			printf("Paths set successfully:\n");
+			int path_index = 0;
+			while(paths[path_index] != NULL)
+			{
+				printf("%s\n", paths[path_index]);
+				path_index++;
+			}
 			printf("tash> ");
 			continue;
 		}
