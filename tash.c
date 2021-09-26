@@ -128,7 +128,8 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 			}
 			if(dir_change == 0)
 			{
-				printf("%s\n", dir_path);
+				// printf("%s\n", dir_path);
+				exit(10);
 			}
 		}
 
@@ -173,7 +174,7 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 	}
 	else
 	{
-		printf("The given command is not executable\n");
+		print_error();
 	}
 	return;
 }
@@ -319,7 +320,6 @@ void process_single_command(char* line, char** paths, int number_of_paths)
 	char *dirpath = "/bin/";
 	strcpy(filepath, dirpath);
 	strcat(filepath, command_token);
-
 	int is_command_executable = access(filepath, X_OK);
 	if(is_command_executable == 0)
 	{
@@ -346,7 +346,8 @@ void process_single_command(char* line, char** paths, int number_of_paths)
 	}
 	else
 	{
-		printf("The given command is not executable\n");
+		printf("File Path is %s\n", filepath);
+		print_error();
 	}
 	return;
 }
@@ -435,7 +436,6 @@ int main(int argc, char **argv)
 			{
 				exit(EXIT_SUCCESS);
 			}
-
 			char** split_line = split_string_delimiter(line);
 			int n_process = get_num_process_to_exec(split_line);
 			int string_index = 0;
@@ -469,7 +469,6 @@ int main(int argc, char **argv)
 		FILE* file = fopen(filename, "r");
 		while((read = getline(&line, &len, file)) != -1)
 		{
-			printf("New Line: %s\n", line);
 			pid_t child_pid, wpid;
 			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
 			{
@@ -499,7 +498,23 @@ int main(int argc, char **argv)
 				}
 				string_index += 1;
 			}
-			while((wpid = wait(&status)) > 0);
+			// while((wpid = wait(&status)) > 0);
+
+			while((wpid = wait(&status)) > 0)
+			{
+				int exact_value_sent = (int)(status / 255);
+				if(exact_value_sent == 10)
+				{
+					if(n_process == 1)
+					{
+						char* print_str = print_str_prep(split_line[0]);
+						char* delimiter = " ";
+						char* command = strtok(print_str,delimiter);
+						command = strtok(NULL, delimiter);
+						chdir(command);
+					}
+				}
+			}
 		}
 		
 	}
