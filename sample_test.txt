@@ -1,0 +1,2 @@
+ls & pwd & echo "Karthik Ragunath Ananda Kumar" & echo Dhivya Nandhini Ananda Kumar & echo Rajya Laxmi Conjeevaram > parallel_test_from_file.txt
+echo Home Sweet Home

@@ -404,7 +404,7 @@ int get_num_process_to_exec(char** two_d_pointer_array)
 	return n_process;
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	char* line = NULL;
 	size_t len = 0;
@@ -417,40 +417,87 @@ int main()
 	{
 		paths[path_index] = (char *)malloc(100 * sizeof(char));
 	}
-	printf("tash> ");
-	pid_t child_pid, wpid;
-	while((read = getline(&line, &len, stdin)) != -1)
-	{
-		if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
-		{
-			exit(EXIT_SUCCESS);
-		}
 
-		char** split_line = split_string_delimiter(line);
-		int n_process = get_num_process_to_exec(split_line);
-		int string_index = 0;
-		/*
-		while(split_line[string_index] != NULL)
+	if(argc == 1)
+	{
+		printf("tash> ");
+		while((read = getline(&line, &len, stdin)) != -1)
 		{
-			char *print_str = print_str_prep(split_line[string_index]);
-			process_single_command(print_str, paths, number_of_paths);
-			string_index += 1;
-		}
-		*/
-		int status = 0;
-		while(string_index < n_process)
-		{
-			int child_pid = fork();
-			if(child_pid == 0)
+			pid_t child_pid, wpid;
+			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
+			{
+				exit(EXIT_SUCCESS);
+			}
+
+			char** split_line = split_string_delimiter(line);
+			int n_process = get_num_process_to_exec(split_line);
+			int string_index = 0;
+			/*
+			while(split_line[string_index] != NULL)
 			{
 				char *print_str = print_str_prep(split_line[string_index]);
-				process_parallel_executions(print_str, paths, number_of_paths);
-				exit(0);
+				process_single_command(print_str, paths, number_of_paths);
+				string_index += 1;
 			}
-			string_index += 1;
+			*/
+			int status = 0;
+			while(string_index < n_process)
+			{
+				int child_pid = fork();
+				if(child_pid == 0)
+				{
+					char *print_str = print_str_prep(split_line[string_index]);
+					process_parallel_executions(print_str, paths, number_of_paths);
+					exit(0);
+				}
+				string_index += 1;
+			}
+			while((wpid = wait(&status)) > 0);
+			printf("tash> ");
 		}
-		while((wpid = wait(&status)) > 0);
-		printf("tash> ");
+	}
+	else if(argc == 2)
+	{
+		char* filename = argv[1];
+		FILE* file = fopen(filename, "r");
+		while((read = getline(&line, &len, file)) != -1)
+		{
+			pid_t child_pid, wpid;
+			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
+			{
+				exit(EXIT_SUCCESS);
+			}
+
+			char** split_line = split_string_delimiter(line);
+			int n_process = get_num_process_to_exec(split_line);
+			int string_index = 0;
+			/*
+			while(split_line[string_index] != NULL)
+			{
+				char *print_str = print_str_prep(split_line[string_index]);
+				process_single_command(print_str, paths, number_of_paths);
+				string_index += 1;
+			}
+			*/
+			int status = 0;
+			while(string_index < n_process)
+			{
+				int child_pid = fork();
+				if(child_pid == 0)
+				{
+					char *print_str = print_str_prep(split_line[string_index]);
+					process_parallel_executions(print_str, paths, number_of_paths);
+					exit(0);
+				}
+				string_index += 1;
+			}
+			while((wpid = wait(&status)) > 0);
+		}
+		
+	}
+	else
+	{
+		printf("More than 2 input batch files. Not valid\n");
 	}
 	free(line);
 	exit(EXIT_SUCCESS);
