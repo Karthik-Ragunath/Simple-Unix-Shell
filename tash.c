@@ -5,6 +5,11 @@
 #include<unistd.h>
 #include<fcntl.h>
 
+void print_error()
+{
+	char error_message[30] = "An error has occured\n";
+	write(STDERR_FILENO, error_message, strlen(error_message));
+}
 
 void process_parallel_executions(char* line, char** paths, int number_of_paths)
 {
@@ -25,6 +30,7 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 	char *redir_file = (char *)malloc(100 * sizeof(char));
 	char *dir_path = (char *)malloc(250 * sizeof(char));
 	int incorrect_cd_cmd = 0;
+	int number_of_cd_arguments = 1;
 	for(argument_index = 0; command_token != NULL; argument_index++)
 	{
 		if(argument_index == 0 && strcmp(command_token, "cd") == 0)
@@ -41,6 +47,8 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 			if(command_token != NULL)
 			{
 				incorrect_cd_cmd = 1;
+				number_of_cd_arguments += 1;
+				continue;
 			}
 			break;
 		}
@@ -103,7 +111,8 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 	{
 		if(incorrect_cd_cmd == 1)
 		{
-			printf("Incorrect cd command\n");
+			// printf("%d arguments are passed to cd.\n", number_of_cd_arguments);
+			print_error();
 		}
 		else
 		{
@@ -111,16 +120,15 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 			{
 				dir_path[strlen(dir_path) - 1] = '\0';
 			}
-			printf("dir path len: %d\n", strlen(dir_path));
-			printf("The dir path is %s\n", dir_path);
 			int dir_change = chdir(dir_path);
 			if(dir_change == -1)
 			{
-				perror("Error: ");
+				// perror("Error: ");
+				print_error();
 			}
-			else if(dir_change == 0)
+			if(dir_change == 0)
 			{
-				printf("dir change is successful. current directory is %s\n", dir_path);
+				printf("%s\n", dir_path);
 			}
 		}
 
@@ -133,7 +141,6 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths)
 	}
 
 	arguments[argument_index] = NULL;
-
 	command_token = strtok(line, delimiter_token);
 
 	if(argument_index == 1 && is_redirection_op_present != 1)
@@ -462,6 +469,7 @@ int main(int argc, char **argv)
 		FILE* file = fopen(filename, "r");
 		while((read = getline(&line, &len, file)) != -1)
 		{
+			printf("New Line: %s\n", line);
 			pid_t child_pid, wpid;
 			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
 			{
