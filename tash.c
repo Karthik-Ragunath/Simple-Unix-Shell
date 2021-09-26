@@ -11,27 +11,54 @@ void process_single_command()
 	return;
 }
 
-void split_string_delimiter(char* string_input)
+char** split_string_delimiter(char* string_input)
 {
-	char* line = NULL;
-	char* delimiter = "&";
-	char* command = strtok(line, delimiter);
+	char* dup_str = strdup(string_input);
+	char* delimiter = " & ";
 	int num_commands = 200;
 	int command_index = 0;
 	int induvidual_command_size = 300;
-	char** induvidual_commands = (char**)malloc(num_commands * sizeof(char*));
+	char** induvidual_commands = (char **)malloc(num_commands * sizeof(char *));
 	for(command_index = 0; command_index < num_commands; command_index++)
 	{
-		induvidual_commands[command_index] = (char*)malloc(induvidual_command_size * sizeof(char));
+		induvidual_commands[command_index] = (char *)malloc(induvidual_command_size*sizeof(char));
 	}
-	command_index = 0;
-	while(command != NULL)
+	if(string_input == NULL)
 	{
-		induvidual_commands[command_index] = command;
-		command = strtok(NULL, delimiter);
-		command_index++;
+		induvidual_commands[0] = NULL;
+		return induvidual_commands;
 	}
+	char *end = strstr(dup_str, delimiter);
+	command_index = 0;
+	while(end != NULL)
+	{
+		size_t len = end - dup_str;
+		char* command = (char *)malloc((len + 1) * sizeof(char));
+		strncpy(command, dup_str, len);
+		strcat(command, "\0");
+		induvidual_commands[command_index] = command;
+		dup_str = dup_str + len + strlen(delimiter);
+		end = strstr(dup_str, delimiter);
+		command_index += 1;
+	}
+	induvidual_commands[command_index] = dup_str;
+	induvidual_commands[command_index + 1] = NULL;
 	return induvidual_commands;
+}
+
+char* print_str_prep(char *input)
+{
+	if(input != NULL)
+	{
+		if(input[strlen(input) - 1] == '\n')
+		{
+			char *dupstr = strdup(input);
+			dupstr[strlen(dupstr) - 1] = '\0';
+			return dupstr;
+		}
+	}
+	return input;
+
 }
 
 int main()
@@ -55,7 +82,14 @@ int main()
 			exit(EXIT_SUCCESS);
 		}
 
-
+		char** split_line = split_string_delimiter(line);
+		int string_index = 0;
+		while(split_line[string_index] != NULL)
+		{
+			char *print_str = print_str_prep(split_line[string_index]);
+			printf("%s\n", print_str);
+			string_index += 1;
+		}
 		char* delimiter_token = " ";
 		char* command_token = strtok(line, delimiter_token);
 
