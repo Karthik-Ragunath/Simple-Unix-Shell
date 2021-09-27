@@ -368,9 +368,28 @@ char* add_space_on_either_side_of_delim(char *line, char* delim)
 	}
 }
 
+int check_num_cd_arguments(char* line)
+{
+	char* duplicate_str = strdup(line);
+	char* local_delimiter = (char*)malloc(100*sizeof(char));
+	strcpy(local_delimiter, " ");
+	int arg_count = 0;
+	if(duplicate_str != NULL)
+	{
+		char* command = strtok(line, local_delimiter);
+		while(command != NULL)
+		{
+			arg_count = arg_count + 1;
+			command = strtok(NULL, local_delimiter);
+		}
+	}
+	return arg_count;
+}
+
 int check_for_cd_func(char* line)
 {
 	char* dupstr = strdup(line);
+	char* duplicate_string = strdup(line);
 	if(dupstr != NULL)
 	{
 		char* delimiter_token = " ";
@@ -379,6 +398,13 @@ int check_for_cd_func(char* line)
 		{
 			if(strcmp(command_token, "cd") == 0)
 			{
+				int arg_count = check_num_cd_arguments(duplicate_string);
+				if(arg_count > 2)
+				{
+					int cd_args = arg_count - 1;
+					printf("%d arguments passes to cd.\n", cd_args);
+					return 2;
+				}
 				command_token = strtok(NULL, delimiter_token);
 				if(command_token != NULL)
 				{
@@ -434,7 +460,7 @@ int main(int argc, char **argv)
 				char *print_str = print_str_prep(split_line[string_index]);
 				print_str = add_space_on_either_side_of_delim(print_str, ">");
 				int check_for_cd = check_for_cd_func(print_str);
-				if(check_for_cd != 1)
+				if(check_for_cd == 0)
 				{
 					int child_pid = fork();
 					if(child_pid == 0)
@@ -495,7 +521,7 @@ int main(int argc, char **argv)
 				char *print_str = print_str_prep(split_line[string_index]);
 				print_str = add_space_on_either_side_of_delim(print_str, ">");
 				int check_for_cd = check_for_cd_func(print_str);
-				if(check_for_cd != 1)
+				if(check_for_cd == 0)
 				{
 					int child_pid = fork();
 					if(child_pid == 0)
