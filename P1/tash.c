@@ -496,6 +496,11 @@ int main(int argc, char **argv)
 	{
 		char* filename = argv[1];
 		FILE* file = fopen(filename, "r");
+		if(file == NULL)
+		{
+			print_error();
+			return 0;
+		}
 		while((read = getline(&line, &len, file)) != -1)
 		{
 			int check_for_paths = check_for_path(line, paths, number_of_paths);
