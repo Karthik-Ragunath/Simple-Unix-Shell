@@ -330,9 +330,28 @@ int check_for_path(char* line, char** paths, int number_of_paths)
 char* add_space_on_either_side_of_delim(char *line, char* delim)
 {
 	char *dupstr = strdup(line);
+	char *second_copy = strdup(line);
+	int atleast_one_delim_present = 0;
+	int atleast_one_char_present = 0;
 	char *end = strstr(dupstr, delim);
 	char *ret_str = (char *)malloc(25000 * sizeof(char));
 	int is_first = 1;
+	while(second_copy != NULL && *second_copy != '\0')
+	{
+		if(*second_copy == delim[0])
+		{
+			atleast_one_delim_present = 1;
+		}
+		if(*second_copy != delim[0] && *second_copy != ' ')
+		{
+			atleast_one_char_present = 1;
+		}
+		second_copy++;
+	}
+	if(atleast_one_char_present == 0 && atleast_one_delim_present == 1)
+	{
+		return dupstr;		
+	}
 	while(end != NULL)
 	{
 		size_t len = end - dupstr;
@@ -353,7 +372,11 @@ char* add_space_on_either_side_of_delim(char *line, char* delim)
 		if(*(end + 1) != '\0' && *(end + 1) != ' ')
 		{
 			strcat(ret_str, " ");
-		}		
+		}
+		if(*(end + 1) == '\0')
+		{
+			strcat(ret_str, " ");
+		}
 		dupstr = dupstr + len + strlen(delim);
 		end = strstr(dupstr, delim);
 	}
@@ -404,8 +427,9 @@ int check_for_cd_func(char* line)
 					int arg_count = check_num_cd_arguments(duplicate_string);
 					if(arg_count > 2)
 					{
-						int cd_args = arg_count - 1;
-						printf("%d arguments passes to cd.\n", cd_args);
+						// int cd_args = arg_count - 1;
+						// printf("%d arguments passes to cd.\n", cd_args);
+						print_error();
 						return 2;
 					}
 					chdir(command_token);	
