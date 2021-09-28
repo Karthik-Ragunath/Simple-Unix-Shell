@@ -447,7 +447,7 @@ int main(int argc, char **argv)
 			pid_t wpid;
 			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
 			{
-				exit(EXIT_SUCCESS);
+				exit(0);
 			}
 			line = print_str_prep(line);
 			line = add_space_on_either_side_of_delim(line, "&");
@@ -462,6 +462,11 @@ int main(int argc, char **argv)
 				int check_for_cd = check_for_cd_func(print_str);
 				if(check_for_cd == 0)
 				{
+					if(strcmp(print_str, "exit") == 0)
+					{
+						// while((wpid = wait(&status)) > 0);
+						exit(0);
+					}
 					int child_pid = fork();
 					if(child_pid == 0)
 					{
@@ -512,7 +517,7 @@ int main(int argc, char **argv)
 			pid_t wpid;
 			if(strcmp(line, "exit\n") == 0 || strcmp(line, "exit") == 0)
 			{
-				exit(EXIT_SUCCESS);
+				exit(0);
 			}
 			
 			line = print_str_prep(line);
@@ -528,6 +533,11 @@ int main(int argc, char **argv)
 				int check_for_cd = check_for_cd_func(print_str);
 				if(check_for_cd == 0)
 				{
+					if(strcmp(print_str, "exit") == 0)
+					{
+						// while((wpid = wait(&status)) > 0);
+						exit(0);
+					}
 					int child_pid = fork();
 					if(child_pid == 0)
 					{
