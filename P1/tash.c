@@ -398,17 +398,17 @@ int check_for_cd_func(char* line)
 		{
 			if(strcmp(command_token, "cd") == 0)
 			{
-				int arg_count = check_num_cd_arguments(duplicate_string);
-				if(arg_count > 2)
-				{
-					int cd_args = arg_count - 1;
-					printf("%d arguments passes to cd.\n", cd_args);
-					return 2;
-				}
 				command_token = strtok(NULL, delimiter_token);
 				if(command_token != NULL)
 				{
-					chdir(command_token);
+					int arg_count = check_num_cd_arguments(duplicate_string);
+					if(arg_count > 2)
+					{
+						int cd_args = arg_count - 1;
+						printf("%d arguments passes to cd.\n", cd_args);
+						return 2;
+					}
+					chdir(command_token);	
 					return 1;
 				}
 			}
