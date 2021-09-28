@@ -38,12 +38,12 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths, 
 	char** arguments = (char **)malloc(arguments_size * sizeof(char *));
 	for(argument_index = 0; argument_index < arguments_size; argument_index++)
 	{
-		arguments[argument_index] = (char *)malloc(100 * sizeof(char));
+		arguments[argument_index] = (char *)malloc(1000 * sizeof(char));
 	}
 	int prev_arg_redir = 0;
 	int is_path_op_present = 0;
-	char *redir_file = (char *)malloc(100 * sizeof(char));
-	char *dir_path = (char *)malloc(250 * sizeof(char));
+	char *redir_file = (char *)malloc(1000 * sizeof(char));
+	char *dir_path = (char *)malloc(500 * sizeof(char));
 	int incorrect_cd_cmd = 0;
 	int number_of_cd_arguments = 1;
 	int is_more_than_one_redir = 0;
@@ -112,7 +112,7 @@ void process_parallel_executions(char* line, char** paths, int number_of_paths, 
 			int resized_arg_index;
 			for(resized_arg_index = argument_index + 1; resized_arg_index < arguments_size; resized_arg_index++)
 			{
-				arguments[resized_arg_index] = (char *)malloc(sizeof(char) * 100);
+				arguments[resized_arg_index] = (char *)malloc(sizeof(char) * 1000);
 			}
 		}
 	}
@@ -331,7 +331,7 @@ char* add_space_on_either_side_of_delim(char *line, char* delim)
 {
 	char *dupstr = strdup(line);
 	char *end = strstr(dupstr, delim);
-	char *ret_str = (char *)malloc(3000 * sizeof(char));
+	char *ret_str = (char *)malloc(25000 * sizeof(char));
 	int is_first = 1;
 	while(end != NULL)
 	{
@@ -371,7 +371,7 @@ char* add_space_on_either_side_of_delim(char *line, char* delim)
 int check_num_cd_arguments(char* line)
 {
 	char* duplicate_str = strdup(line);
-	char* local_delimiter = (char*)malloc(100*sizeof(char));
+	char* local_delimiter = (char*)malloc(1000*sizeof(char));
 	strcpy(local_delimiter, " ");
 	int arg_count = 0;
 	if(duplicate_str != NULL)
@@ -423,13 +423,13 @@ int main(int argc, char **argv)
 	size_t len = 0;
 	ssize_t read;
 	char** paths;
-	int number_of_paths = 100;
-	paths = (char **)malloc(100 * sizeof(char *));
+	int number_of_paths = 1000;
+	paths = (char **)malloc(1000 * sizeof(char *));
 	int path_index;
 	int path_set = 0;
 	for(path_index = 0; path_index < 100; path_index++)
 	{
-		paths[path_index] = (char *)malloc(100 * sizeof(char));
+		paths[path_index] = (char *)malloc(1000 * sizeof(char));
 	}
 
 	if(argc == 1)
@@ -519,7 +519,6 @@ int main(int argc, char **argv)
 			{
 				exit(0);
 			}
-			
 			line = print_str_prep(line);
 			line = add_space_on_either_side_of_delim(line, "&");
 			char** split_line = split_string_delimiter(line);
